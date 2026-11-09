@@ -301,7 +301,6 @@
     const saved = state.preferences;
     const prefStatus = saved ? 'Saved memory is available for this browser.' : 'Save preferences to demonstrate long-term memory.';
     return hero() +
-      agentVisualizer(state.activeAgentStep) +
       '<section class="section-head"><div><div class="section-kicker">START WITH A REQUEST</div><h2>Tell your food agent what you need</h2><p>The agent extracts hard constraints, queries the simulated restaurant catalogue, then ranks only options that meet the rules.</p></div><div class="subtle-count">' + prefStatus + '</div></section>' +
       '<div class="discover-grid"><section class="panel request-panel">' +
         '<h3 class="panel-title">Your order brief</h3><p class="panel-subtitle">The primary jury scenario is already filled in. Edit it to test the agents with another request.</p>' +
