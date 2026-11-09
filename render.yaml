@@ -1,0 +1,18 @@
+# Render.com Blueprint Specification for FoodieAgent
+# Deploy with 1-click on https://render.com
+services:
+  - type: web
+    name: foodie-agent
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: PORT
+        value: 3000
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
