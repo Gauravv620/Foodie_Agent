@@ -162,7 +162,6 @@
     const unread = state.notifications.filter(n => !n.is_read).length;
     return '<nav class="app-nav" aria-label="Main navigation">' +
       '<button class="nav-tab ' + (state.tab === "discover" ? "active" : "") + '" data-action="tab" data-tab="discover">⌕ Discover</button>' +
-      '<button class="nav-tab ' + (state.tab === "chat" ? "active" : "") + '" data-action="tab" data-tab="chat">💬 Agent Chat</button>' +
       '<button class="nav-tab ' + (state.tab === "orders" ? "active" : "") + '" data-action="tab" data-tab="orders">▤ Orders <span class="count">' + state.orders.length + '</span></button>' +
       '<button class="nav-tab ' + (state.tab === "memory" ? "active" : "") + '" data-action="tab" data-tab="memory">◉ Memory & tools</button>' +
       '<button class="nav-tab ' + (state.tab === "activity" ? "active" : "") + '" data-action="tab" data-tab="activity">✳ Agent activity</button>' +
