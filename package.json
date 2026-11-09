@@ -1,0 +1,25 @@
+{
+  "name": "foodie-agent",
+  "version": "2.0.0",
+  "description": "Intelligent Agentic Food Ordering System with Local SQLite & Gemini AI Support",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/agent.test.js"
+  },
+  "keywords": [
+    "agentic-ai",
+    "multi-agent",
+    "food-ordering",
+    "gemini",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4eb">
+  <meta name="description" content="FoodieAgent finds eligible vegetarian pizza options with transparent price and delivery constraints. Demo catalogue only.">
+  <title>FoodieAgent — Intelligent Food Ordering System</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a href="/" class="brand" aria-label="FoodieAgent home" data-action="go-home">
+        <span class="brand-mark">f.</span>
+        <span class="brand-copy"><strong>Foodie<span>Agent</span></strong><small>INTELLIGENT FOOD ORDERING</small></span>
+      </a>
+      <div class="topbar-right">
+        <button class="topbar-badge-btn" id="ai-mode-btn" type="button" data-action="open-ai-settings" title="Click to view AI mode or configure Gemini API Key">
+          <span class="ai-dot-pulse"></span>
+          <span id="ai-mode-label">AI Agent</span>
+        </button>
+        <span class="demo-pill"><span class="status-dot"></span> SIMULATED DATA</span>
+        <button class="icon-button" type="button" data-action="open-notifications" aria-label="Notifications">♧ <span id="notification-count" class="notification-count">0</span></button>
+      </div>
+    </header>
+    <main id="app" class="main-wrap">
+      <div class="loading-state"><span class="loader"></span><p>Preparing your food discovery workspace…</p></div>
+    </main>
+    <footer class="site-footer">
+      <span>FoodieAgent · Agentic AI mini-project · <a href="/guide.html">Project guide</a> · <a href="/viva.html">Viva questions</a></span>
+      <span>Illustrative menu, prices, and delivery estimates — no live restaurant is contacted.</span>
+    </footer>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+</body>
+</html>
