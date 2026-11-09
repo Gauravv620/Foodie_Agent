@@ -72,7 +72,9 @@
     simulatingOrderId: null,
     simTimer: null,
     heroSlideIndex: 0,
-    heroSlideTimer: null
+    heroSlideTimer: null,
+    isChatbotOpen: false,
+    unreadBotCount: 0
   };
 
   async function api(path, options={}){
@@ -347,11 +349,10 @@
   }
 
   // ==========================================================================
-  // Conversational AI Chat View (End-to-End Chatbot)
+  // Conversational AI Chat Messages Renderer
   // ==========================================================================
-  function chatView(){
-    const isLive = Boolean(state.geminiApiKey || state.llmStatus?.geminiConfigured);
-    const msgs = state.chatMessages.map(m => {
+  function renderChatMessagesList(){
+    return state.chatMessages.map(m => {
       const isUser = m.role === "user";
       const formattedText = renderMarkdown(m.text);
 
@@ -446,6 +447,12 @@
         toolPill + cardsHtml + followupChips +
         '</div>';
     }).join("");
+  }
+
+  // Conversational AI Chat View (Tab View)
+  function chatView(){
+    const isLive = Boolean(state.geminiApiKey || state.llmStatus?.geminiConfigured);
+    const msgs = renderChatMessagesList();
 
     return '<div class="view-header"><div><div class="section-kicker">CONVERSATIONAL AI AGENT</div><h1>Chat with FoodieAgent</h1><p>Full end-to-end food ordering concierge with Dual-Tier Memory (LTM + STM) and SQLite WAL crash durability.</p></div><button class="topbar-badge-btn" data-action="open-ai-settings"><span class="ai-dot-pulse"></span> ' + (isLive ? "Gemini Live Active" : "Offline Deterministic Mode") + '</button></div>' +
       '<div class="chat-container">' +
@@ -497,6 +504,100 @@
           '<div class="callout" style="margin-top:16px"><strong>Safety Protocol:</strong> Financial operations are simulated. Every order requires explicit confirmation before any record is created.</div>' +
         '</aside>' +
       '</div>';
+  }
+
+  // ==========================================================================
+  // Real Floating Chatbot Widget (Always-Accessible Intercom-Style Launcher)
+  // ==========================================================================
+  function renderChatbotWidget(){
+    const root = $("#chatbot-root");
+    if (!root) return;
+
+    const msgs = renderChatMessagesList();
+    const isLive = Boolean(state.geminiApiKey || state.llmStatus?.geminiConfigured);
+    const openClass = state.isChatbotOpen ? " open" : "";
+
+    root.innerHTML = `
+      <div class="chatbot-widget-container${openClass}">
+        <!-- Floating Launcher Button with Live Pulse -->
+        <button type="button" class="chatbot-launcher-btn" data-action="toggle-chatbot" aria-label="Toggle FoodieAgent AI Chatbot">
+          <span class="chatbot-launcher-icon">💬</span>
+          <span class="chatbot-launcher-close">✕</span>
+          ${state.unreadBotCount > 0 ? `<span class="chatbot-badge">${state.unreadBotCount}</span>` : ''}
+        </button>
+
+        <!-- Floating Chatbot Window -->
+        <section class="chatbot-panel" role="region" aria-label="FoodieAgent Concierge Window">
+          <!-- Chatbot Header -->
+          <div class="chatbot-header">
+            <div class="chatbot-header-left">
+              <div class="chatbot-avatar">
+                🍕
+                <span class="online-status"></span>
+              </div>
+              <div class="chatbot-header-info">
+                <strong>FoodieAgent AI</strong>
+                <small>${isLive ? "🟢 Gemini Live Active" : "🛡️ Offline Rule Engine"} · Memory Active</small>
+              </div>
+            </div>
+            <div class="chatbot-header-actions">
+              <button type="button" class="chatbot-header-btn" data-action="clear-chat" title="Clear conversation">🗑️</button>
+              <button type="button" class="chatbot-header-btn" data-action="toggle-chatbot" title="Minimize chat">✕</button>
+            </div>
+          </div>
+
+          <!-- Quick Action Chips -->
+          <div class="chatbot-chips-strip">
+            <button type="button" class="chatbot-quick-chip" data-action="send-chat-chip" data-query="Order a vegetarian pizza under ₹500 delivered within 30 minutes.">🍕 Pizza &lt; ₹500</button>
+            <button type="button" class="chatbot-quick-chip" data-action="send-chat-chip" data-query="Order the first one">👉 Order First</button>
+            <button type="button" class="chatbot-quick-chip" data-action="send-chat-chip" data-query="Make it pure veg and under 350">🔄 Veg &lt; 350</button>
+            <button type="button" class="chatbot-quick-chip" data-action="send-chat-chip" data-query="Compare Farmhouse Veg Pizza and Classic Margherita">📊 Compare</button>
+            <button type="button" class="chatbot-quick-chip" data-action="send-chat-chip" data-query="Where is my order?">🧾 Track Order</button>
+          </div>
+
+          <!-- Chat Messages Body -->
+          <div class="chatbot-messages-body" id="chatbot-messages-container">
+            ${msgs}
+            ${state.chatLoading ? `
+              <div class="chat-msg model">
+                <div class="chat-bubble">
+                  <div class="typing-dots"><span></span><span></span><span></span></div>
+                  <span style="font-size:11px;color:#617567;margin-left:6px">FoodieAgent is evaluating catalogue & prices…</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form class="chatbot-input-bar" id="chatbot-float-form">
+            <input type="text" class="chatbot-input-field" id="chatbot-float-input" placeholder="Ask for food, budget, dietary shifts…" autocomplete="off" ${state.chatLoading ? 'disabled' : ''}>
+            <button type="submit" class="chatbot-send-btn" ${state.chatLoading ? 'disabled' : ''} aria-label="Send message">↗</button>
+          </form>
+        </section>
+      </div>
+    `;
+
+    bindChatbotForm();
+    if (state.isChatbotOpen) {
+      scrollChatToBottom();
+      setTimeout(() => $("#chatbot-float-input")?.focus(), 150);
+    }
+  }
+
+  function bindChatbotForm(){
+    const floatForm = $("#chatbot-float-form");
+    if (floatForm) {
+      floatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = $("#chatbot-float-input");
+        const val = input?.value.trim();
+        if (val) {
+          state.chatInput = val;
+          if (input) input.value = "";
+          onSendChat();
+        }
+      });
+    }
   }
 
   function viewHeader(kicker, title, description, action=""){
@@ -644,6 +745,7 @@
     app.innerHTML = nav() + view +
       '<div class="content-section" style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap"><p class="footnote" style="margin:0">FoodieAgent v2.0 · Local SQLite Storage · Assumed 5% Food Tax. Simulated catalogue.</p><button class="btn btn-secondary btn-small" data-action="reset-demo">Reset this browser demo</button></div>';
     bindCurrentForms();
+    renderChatbotWidget();
     if (state.tab === "discover") {
       startHeroSlider();
     } else if (state.heroSlideTimer) {
@@ -806,6 +908,8 @@
     setTimeout(() => {
       const c = $("#chat-messages-container");
       if (c) c.scrollTop = c.scrollHeight;
+      const floatC = $("#chatbot-messages-container");
+      if (floatC) floatC.scrollTop = floatC.scrollHeight;
     }, 50);
   }
 
@@ -1138,6 +1242,11 @@
     if (action === "tab") { state.tab = button.dataset.tab; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else if (action === "go-home") { state.tab = "discover"; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else if (action === "open-notifications") { state.tab = "notifications"; render(); }
+    else if (action === "toggle-chatbot") {
+      state.isChatbotOpen = !state.isChatbotOpen;
+      if (state.isChatbotOpen) state.unreadBotCount = 0;
+      renderChatbotWidget();
+    }
     else if (action === "open-ai-settings") { state.modal = "ai-settings"; renderModal(); }
     else if (action === "remove-gemini-key") {
       state.geminiApiKey = ""; localStorage.removeItem("foodieagent-gemini-key"); state.modal = ""; renderModal(); render(); notify("Switched to Offline Mode.");
